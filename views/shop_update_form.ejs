@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <title>Document</title>
+  <style>
+    table {
+      margin: auto;
+    }
+
+    input[type="text"] {
+      border: 1.5px rgb(68, 136, 244) solid;
+      width: 500px;
+      height: 30px;
+      border-radius: 5px;
+      padding-left: 10px;
+    }
+
+    textarea {
+      border: 1.5px rgb(68, 136, 244) solid;
+
+      border-radius: 5px;
+      padding-left: 10px;
+      padding-top: 10px;
+      resize: none;
+    }
+
+    .header {
+      height: 30px;
+    }
+
+    input[type="submit"] {
+      width: 100px;
+      height: 40px;
+      font-size: 15px;
+      border: 0;
+      outline: 1.5px rgb(68, 136, 244) solid;
+      border-radius: 5px;
+      padding-left: 10px;
+      background-color: rgb(164, 199, 255);
+    }
+
+    input[type="submit"]:active {
+      width: 100px;
+      height: 40px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 5px;
+      outline: 1.5px rgb(27, 76, 155) solid;
+      padding-left: 10px;
+      background-color: rgb(68, 136, 244);
+    }
+  </style>
+</head>
+
+<body>
+  <input type="hidden" value="<%=rows.id%>" name="shop_id">
+  <table>
+    <tr>
+      <td class="header">이름</td>
+    </tr>
+    <tr>
+      <td><input type="text" name="name" placeholder="이름 2글자이상 20글자 이하" value="<%=rows.name%>"></td>
+    </tr>
+    <tr>
+      <td class="header">음식소개</td>
+    </tr>
+    <tr>
+      <td><input type="text" name="description" placeholder="음식소개 2글자이상 70글자 이하" value="<%=rows.description%>"></td>
+    </tr>
+    <tr>
+      <td class="header">가격</td>
+    </tr>
+    <tr>
+      <td><input type="number" name="price" value="<%=rows.price%>"></td>
+    </tr>
+    <tr>
+      <td class="header">이미지</td>
+    </tr>
+    <tr>
+      <td>
+        <img src="/shop/image?id=<%=rows.img%>" width="352px" height="288px">
+        <br>
+        <input type="file" name="img">
+      </td>
+    </tr>
+    <td>
+      <input type="button" value="수정하기" onclick="validation();">
+    </td>
+    </tr>
+  </table>
+  <script>
+    async function validation() {
+      const shop_id = document.getElementsByName("shop_id")[0].value;
+      const name = document.getElementsByName("name")[0].value;
+      const description = document.getElementsByName("description")[0].value;
+      const price = document.getElementsByName("price")[0].value;
+      const img = document.getElementsByName("img")[0].value;
+      const img2 = document.getElementsByName("img")[0];
+
+      if (name.length <= 1 || name.length >= 21) {
+        alert("이름은 2글자이상 20글자이하");
+        return false;
+      }
+      if (description.length <= 1 || description.length >= 71) {
+        alert("음식소개는 2글자이상 70글자이하");
+        return false;
+      }
+
+      if (price < 500 || price > 10000000) {
+        alert("가격은 500원 이상 천만원 이하");
+        return false;
+      }
+
+
+
+      if (img != "") {
+        const ext = img.split('.').pop().toLowerCase();
+        const ext_array = ["jpg", "jpeg", "png"];
+        let ext_check = false;
+        for (let i = 0; i < ext_array.length; i++) {
+          if (ext == ext_array[i]) {
+            ext_check = true;
+          }
+        }
+        if (ext_check == false) {
+          alert("jpg,jpeg,png만 등록할수 있습니다.");
+          return false;
+        }
+
+        async function img_check_func() {
+          return new Promise((resolve, reject) => {
+            const _URL = window.URL || window.webkitURL;
+            const image = new Image();
+
+            image.src = _URL.createObjectURL(img2.files[0]);
+
+            image.onerror = () => {
+              resolve(false);
+            }
+            image.onload = () => {
+              resolve(true);
+            }
+          });
+        }
+        const img_check = await img_check_func();
+        if (img_check == false) {
+          alert("이미지 파일이 아님");
+          return false;
+        }
+      }
+
+
+      const formData = new FormData();
+      formData.append("shop_id", shop_id);
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("price", price);
+      formData.append("img", img2.files[0]);
+
+
+      $.ajax({
+        url: "/shop/shop_update_ok",
+        type: 'POST',
+        async: false,
+        contentType: false,
+        processData: false,
+        data: formData,
+      }).done((json) => {
+        switch (json.status) {
+          case -1:
+            alert("오류");
+            break;
+          case 0:
+            alert("로그인이 필요함");
+            window.location.href = "/user/login_form";
+            break;
+          case 1:
+            alert("본인의 상품이 아님");
+            break;
+          case 2:
+            window.location.href = "/";
+            break;
+          default:
+            break;
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

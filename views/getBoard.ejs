@@ -1,0 +1,283 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <table border="1">
+    <tr>
+      <th>제목</th>
+      <th>작성자</th>
+    </tr>
+    <tr>
+      <td><%= rows.title %></td>
+      <td><%= rows.user_name %></td>
+    </tr>
+    <tr>
+      <th>내용</th>
+    </tr>
+    <tr>
+      <td><%= rows.contents %></td>
+    </tr>
+  </table>
+</body>
+
+</html>-->
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>글내용</title>
+  <style>
+    table {
+      margin: auto;
+    }
+
+    input[type="text"] {
+      border: 1.5px rgb(68, 136, 244) solid;
+      width: 500px;
+      height: 30px;
+      border-radius: 5px;
+      padding-left: 10px;
+    }
+
+    textarea {
+      border: 1.5px rgb(68, 136, 244) solid;
+
+      border-radius: 5px;
+      padding-left: 10px;
+      padding-top: 10px;
+      resize: none;
+    }
+
+    .header {
+      height: 30px;
+    }
+
+    input {
+      width: 100px;
+      height: 40px;
+      font-size: 15px;
+      border: 0;
+      outline: 1.5px rgb(68, 136, 244) solid;
+      border-radius: 5px;
+      padding-left: 10px;
+      background-color: rgb(164, 199, 255);
+    }
+
+    input:active {
+      width: 100px;
+      height: 40px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 5px;
+      outline: 1.5px rgb(27, 76, 155) solid;
+      padding-left: 10px;
+      background-color: rgb(68, 136, 244);
+    }
+  </style>
+</head>
+
+<body>
+  <table>
+    <tr>
+      <td class="header">제목</td>
+    </tr>
+    <tr>
+      <td><textarea readonly cols="50" rows="1" name="title"><%= rows.title %></textarea></td>
+    </tr>
+    <tr>
+      <td class="header">내용</td>
+    </tr>
+    <tr>
+      <td><textarea readonly cols="50" rows="20" name="contents"><%= rows.contents %></textarea></td>
+    </tr>
+    <tr>
+      <td>
+
+        <!--
+        <form method="post" action="/board_delete_ok" onclick="validation();" >
+          <input type="hidden" value="<%= rows.id%>" name="user_id">
+          <input type="button" value="삭제">
+        </form>-->
+        <input type="hidden" value="<%= rows.id%>" name="id">
+        <input type="button" value="수정" onclick="location.href='/board_update_form?id=<%=rows.id%>'">
+        <input type="button" value="삭제" onclick="delete_validation();"><br>
+      </td>
+    </tr>
+    <tr>
+      <td><textarea cols="50" rows="5" name="comments" placeholder="댓글입력(3글자 이상 20글자 이하)"></textarea><br>
+        <input type="button" value="댓글작성" onclick="comment_validation();">
+      </td>
+    </tr>
+  </table>
+  <table border="1" id="comment_table">
+    <% for(let i = 0; i < rows_comment.length; i++){%>
+    <tr>
+      <td><%=rows_comment[i].user_id%><%=rows_user[i].GM%> : <%=rows_comment[i].comments%></td>
+      <td>
+
+        <input type="hidden" value="<%=rows_comment[i].id%>" name="comment_id">
+        <input type="button" value="삭제" onclick="comment_delete_validation(<%=i%>);">
+      </td>
+    </tr>
+    <% }%>
+  </table>
+  <script>
+    function comment_delete_validation(i) {
+      const comment_id = document.getElementsByName("comment_id")[i].value;
+      $.ajax({
+        url: "/comment/comment_delete_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          comment_id: comment_id,
+        },
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요합니다.");
+            break;
+          case 1:
+            alert("본인의 댓글이 아님");
+            break;
+          default:
+            $("#comment_table").load(window.location.href + " #comment_table");
+            break;
+        }
+      });
+    }
+
+    function comment_validation() {
+      const comments = document.getElementsByName("comments")[0].value;
+      const board_id = document.getElementsByName("id")[0].value;
+      if (comments.length <= 2 || comments.length >= 21) {
+        alert("3글자이상 20글자 이하여야합니다.");
+        return false;
+      }
+      $.ajax({
+        url: "/comment/comment_insert_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          comments: comments,
+          board_id: board_id,
+        }
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요합니다.");
+            break;
+          default:
+            document.getElementsByName("comments")[0].value = "";
+            $("#comment_table").load(window.location.href + " #comment_table");
+            break;
+        }
+      });
+    }
+
+    function delete_validation() {
+      let status = 0;
+      const id = document.getElementsByName("id")[0].value;
+      $.ajax({
+        url: "/board_delete_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          id: id
+        },
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요함");
+            status = 0;
+            break;
+          case 1:
+            alert("본인의 게시물이 아님");
+            status = 1;
+            break;
+          case 2:
+            status = 2;
+            break;
+          default:
+            break;
+        }
+      });
+      if (status == 2) {
+        window.location.href = "/";
+      }
+    }
+    /*
+        function update_form_validation() {
+          const id = document.getElementsByName("id")[0].value;
+          $.ajax({
+            url: "/board_update_form_validation",
+            type: 'POST',
+            async: false,
+            dataType: "JSON",
+            data: {
+              id: id,
+            },
+          }).done((json) => {
+            switch (json.status) {
+              case 0:
+                alert("로그인이 필요함");
+                break;
+              case 1:
+                alert("본인의 게시물이 아님");
+                break;
+              case 2:
+                window.location.href="/board_update_form?id=<%=rows.id%>";
+                break;
+              default:
+                break;
+            }
+          });
+        }*/
+    /*
+    async function validation() {
+      
+      const id = document.getElementsByName("id")[0].value;
+      async function json_data() {
+
+        return new Promise((resolve, reject) => {
+          $.ajax({
+            url: "/board_delete_ok",
+            type: 'POST',
+            async: false,
+            dataType: "JSON",
+            data: {
+              id: id,
+            },
+          }).done((json) => {
+            resolve(json);
+          });
+        })
+      }
+      const json = await json_data();
+      if (json.status == 0) {
+        alert("로그인이 필요함");
+        return false;
+      } else if (json.status == 1) {
+        alert("본인의 게시물이 아님");
+        return false;
+      } else {
+        return true;
+      }
+      return false;
+    }*/
+  </script>
+</body>
+
+</html>

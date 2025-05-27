@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <title>Document</title>
+  <style>
+    table {
+      margin: auto;
+    }
+
+    input[type="text"] {
+      border: 1.5px rgb(68, 136, 244) solid;
+      width: 500px;
+      height: 30px;
+      border-radius: 5px;
+      padding-left: 10px;
+    }
+
+    textarea {
+      border: 1.5px rgb(68, 136, 244) solid;
+
+      border-radius: 5px;
+      padding-left: 10px;
+      padding-top: 10px;
+      resize: none;
+    }
+
+    .header {
+      height: 30px;
+    }
+
+    input[type="submit"] {
+      width: 100px;
+      height: 40px;
+      font-size: 15px;
+      border: 0;
+      outline: 1.5px rgb(68, 136, 244) solid;
+      border-radius: 5px;
+      padding-left: 10px;
+      background-color: rgb(164, 199, 255);
+    }
+
+    input[type="submit"]:active {
+      width: 100px;
+      height: 40px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 5px;
+      outline: 1.5px rgb(27, 76, 155) solid;
+      padding-left: 10px;
+      background-color: rgb(68, 136, 244);
+    }
+  </style>
+</head>
+
+<body>
+  <input type="hidden" name="id" value="<%=rows[0].id %>">
+  <table>
+    <tr>
+      <td class="header">제목</td>
+    </tr>
+    <tr>
+      <td><input type="text" name="title" placeholder="제목 2글자이상 20글자 이하" value="<%=rows[0].title %>"></td>
+    </tr>
+    <tr>
+      <td class="header">내용</td>
+    </tr>
+    <tr>
+      <td><input type="text" name="contents" placeholder="내용 2글자이상 100글자 이하" value="<%=rows[0].contents %>"></td>
+    </tr>
+    <tr>
+      <td>
+        <input type="button" value="수정하기" onclick="validation();">
+      </td>
+    </tr>
+  </table>
+  <script>
+    function validation() {
+      const id = document.getElementsByName("id")[0].value;
+      const title = document.getElementsByName("title")[0].value;
+      const contents = document.getElementsByName("contents")[0].value;
+      if (title.length <= 1 || title.length >= 21) {
+        alert("제목은 2글자이상 20글자이하");
+        return false;
+      }
+      if (contents.length <= 1 || contents.length >= 101) {
+        alert("내용은 2글자이상 100글자이하");
+        return false;
+      }
+      $.ajax({
+        url: "/board_update_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          id: id,
+          title: title,
+          contents: contents,
+        },
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요함");
+            window.location.href = "/user/login_form";
+            break;
+          case 1:
+            alert("본인의 게시물이 아님");
+            break;
+          case 2:
+            window.location.href = "/";
+            break;
+          default:
+            break;
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

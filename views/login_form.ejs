@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+    <input type="text" placeholder="아이디(3글자 이상,10글자 이하,영어 숫자만 입력가능)" size="45" name="user_id" oninput="this.value = this.value.replace(/[^A-z0-9]/g, '')
+.replace(/(\..*)\./g, '$1');"><br>
+    <input type="password" placeholder="비밀번호(4글자 이상,10글자 이하)" size="45" name="password"><br>
+    <input type="button" value="로그인" onclick="validation();">
+  <script>
+    function validation() {
+      const user_id = document.getElementsByName("user_id")[0].value;
+      const password = document.getElementsByName("password")[0].value;
+      if (user_id.length <= 2 || user_id.length >= 11) {
+        alert("아이디는 3글자이상 10글자이하로 작성해주세요");
+        return false;
+      }
+      if (password.length <= 3 || password.length >= 11) {
+        alert("패스워드는 4글자이상 10글자이하로 작성해주세요");
+        return false;
+      }
+      
+      $.ajax({
+        url: "/user/login_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          user_id: user_id,
+          password: password
+        }
+      }).
+      done((json) => {
+        if (json.login_success == 0) {
+          alert("아이디와 비밀번호를 확인해주세요.");
+        } else {
+          window.location.href = "/";
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

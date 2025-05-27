@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+
+  <input type="text" placeholder="아이디(3글자 이상,10글자 이하,영어 숫자만 입력가능)" size="45" name="user_id" oninput="this.value = this.value.replace(/[^A-z0-9]/g, '')
+.replace(/(\..*)\./g, '$1');"><br>
+  <input type="password" placeholder="비밀번호(4글자 이상,10글자 이하)" size="45" name="password"><br>
+  <input type="text" placeholder="닉네임(2글자 이상,6글자 이하)" size="45" name="name"><br>
+  <input type="button" value="작성" name="register_submit" onclick="validation();">
+  <script>
+    /*
+    $('input[name="register_submit"]').on("click", () => {
+      const user_id = $('input[name="user_id"]').val();
+      const name = $('input[name="name"]').val();
+      $.ajax({
+        url: "/register_validation",
+        type: 'POST',
+        dataType: "JSON",
+        data: {
+          user_id: user_id,
+          name: name
+        }
+      }).done((json) => {
+        if (json.user_id_null == false) {
+          alert("중복된 아이디입니다.");
+
+          return false;
+        }
+        if (json.name_null == false) {
+          alert("중복된 닉네임입니다.");
+
+          return false;
+        }
+      });
+    });*/
+
+
+    function validation() {
+
+      const user_id = document.getElementsByName("user_id")[0].value;
+      const password = document.getElementsByName("password")[0].value;
+      const name = document.getElementsByName("name")[0].value;
+      if (user_id.length <= 2 || user_id.length >= 11) {
+        alert("아이디는 3글자이상 10글자이하로 작성해주세요");
+        return false;
+      }
+      if (password.length <= 3 || password.length >= 11) {
+        alert("패스워드는 4글자이상 10글자이하로 작성해주세요");
+        return false;
+      }
+      if (name.length <= 1 || name.length >= 7) {
+        alert("닉네임은 2글자이상 6글자이하로 작성해주세요");
+        return false;
+      }
+      $.ajax({
+        url: "/user/register_insert_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          user_id: user_id,
+          name: name,
+          password : password
+        },
+        error: (req, status, err) => {
+          console.log("에러임");
+        }
+      }).done((json) => {
+        if (json.status == 0) {
+          alert("중복된 아이디입니다.");
+        }
+        if (json.status == 1) {
+          alert("중복된 닉네임입니다.");
+        }
+        if (json.status == 2)
+        {
+          window.location.href = "/";
+        }
+      });
+    }
+
+    /*
+    async function f() {
+      const response = await fetch('/register_form');
+      if (!response.ok) {
+        throw new Error("에러");
+      }
+      console.log("결과")
+      //const result = await response.json();
+      //console.log(result);
+    }*/
+    /*
+    fetch('/register_form')
+      .then((response) => {
+        return "ㅇㅇ";
+      }).then((결과) => {
+        console.log("결과")
+      });*/
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  div {
+    border: 1px solid black;
+    width: 500px;
+    height: 150px;
+    font-size: 20px;
+  }
+</style>
+
+<body>
+  <div>
+
+    <%
+    const GM = (user_info.GM ? "GM" : "유저");
+    %>
+    [회원정보]<br>
+    <%if(user_info == false)
+    {%>
+    <%="로그인이 필요합니다."%>
+    <%  
+    }else{%>
+    닉네임 : <%=user_info.name%><br>
+    등급 : <%=GM%><br>
+    보유중인 돈 : <%=user_info.money%>$
+    <%}
+    %>
+
+
+
+
+  </div>
+  <input type='button' value='회원가입' onclick="location.href='user/register_form'">
+  <%if(user_info == false){%>
+  <input type='button' value='로그인' onclick="location.href='user/login_form'"><br>
+  <%}else{%>
+  <input type='button' value='로그아웃' onclick="location.href='user/logout'"><br>
+    <input type='button' value='구매내역' onclick="location.href='/shop/receipt'">
+  <input type='button' value='글쓰기' onclick="location.href='/board_form'">
+  <input type='button' value='상점등록' onclick="location.href='/shop/shop_form'">
+  <%}%>
+  <input type='button' value='상점목록' onclick="location.href='/shop/shoplist'">
+  
+  <br>
+  <h1>[문의 게시판]</h1>
+  <table border="1">
+    <tr>
+      <th>번호</th>
+      <th>제목</th>
+      <th>작성자</th>
+    </tr>
+    <% for(let i = 0; i < rows.length; i++){ %>
+  <tr>
+    <td><%= rows[i].id %></td>
+    <td><a href="/board_select?id=<%= rows[i].id %>"><%= rows[i].title %></a></td>
+    <td><%= rows_name[i] %></td>
+  </tr>
+  <%  } %>
+
+  </table>
+</body>
+
+</html>

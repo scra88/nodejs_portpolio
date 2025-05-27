@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form onsubmit="return validation();">
+
+  </form>
+  <script>
+    function validation() {
+      let status = 0;
+      const user_id = document.getElementsByName("user_id")[0].value;
+      $.ajax({
+        url: "/board_test",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          user_id: user_id
+        },
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요함");
+            status = 0;
+            break;
+          case 1:
+            alert("본인의 게시물이 아님");
+            status = 1;
+            break;
+          case 2:
+            status = 2;
+            break;
+          default:
+            break;
+        }
+      });
+      if (status == 2) {
+        return true;
+        //window.location.href = "/";
+      }
+      return false;
+    }
+  </script>
+
+  </table>
+</body>
+
+</html>

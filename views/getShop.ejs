@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>글내용</title>
+  <style>
+    table {
+      margin: auto;
+    }
+
+    input[type="text"] {
+      border: 1.5px rgb(68, 136, 244) solid;
+      width: 500px;
+      height: 30px;
+      border-radius: 5px;
+      padding-left: 10px;
+    }
+
+    textarea {
+      border: 1.5px rgb(68, 136, 244) solid;
+
+      border-radius: 5px;
+      padding-left: 10px;
+      padding-top: 10px;
+      resize: none;
+    }
+
+    .header {
+      height: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <table>
+    <tr>
+      <td class="header">작성자</td>
+    </tr>
+    <tr>
+      <td><textarea readonly cols="50" rows="1" name="user_id"><%=rows.user_id%></textarea></td>
+    </tr>
+    <tr>
+      <td class="header">이름</td>
+    </tr>
+    <tr>
+      <td><textarea readonly cols="50" rows="1" name="name"><%=rows.name%></textarea></td>
+    </tr>
+    <tr>
+      <td class="header">설명</td>
+    </tr>
+    <tr>
+      <td><textarea readonly cols="50" rows="1" name="description"><%=rows.description%></textarea></td>
+    </tr>
+    <tr>
+      <td class="header">가격</td>
+    </tr>
+    <tr>
+      <td><input type="number" name="price" readonly value="<%=rows.price%>"></td>
+    </tr>
+    <tr>
+      <td class="header">이미지</td>
+    </tr>
+    <tr>
+      <td><img src="/shop/image?id=<%=rows.img%>" width="352px" height="288 px">
+        <br><a href="/shop/image?id=<%=rows.img%>" target="_blink">[사진 원본보기]</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="hidden" name="shop_id" value="<%=rows.id%>">
+        <input type="button" value="구매" onclick="buy_validation();">
+        <input type="button" value="수정" onclick="location.href='/shop/shop_update_form?id=<%=rows.id%>'">
+        <input type="button" value="삭제" onclick="delete_validation();">
+      </td>
+    </tr>
+  </table>
+  <script>
+    function buy_validation() {
+      const shop_id = document.getElementsByName("shop_id")[0].value;
+      $.ajax({
+
+        url: "/shop/shop_buy_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          shop_id: shop_id,
+        },
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요합니다.");
+            window.location.href = "/user/login_form";
+            break;
+          case 1:
+            alert("본인이 등록한 아이템은 구매할수없음");
+            break;
+          case 2:
+            alert("돈이 부족합니다. 보유중인 돈 : " + json.money + "$");
+            break;
+          case 3:
+            alert("구매완료");
+            window.location.href = "/";
+            break;
+          default:
+            break;
+        }
+      })
+    }
+
+    function delete_validation() {
+      const shop_id = document.getElementsByName("shop_id")[0].value;
+      $.ajax({
+        url: "/shop/shop_delete_ok",
+        type: 'POST',
+        async: false,
+        dataType: "JSON",
+        data: {
+          shop_id: shop_id
+        },
+      }).done((json) => {
+        switch (json.status) {
+          case 0:
+            alert("로그인이 필요합니다.");
+            window.location.href = "/user/login_form";
+            break;
+          case 1:
+            alert("본인이 등록한 상품이 아닙니다.");
+            break;
+          case 2:
+            window.location.href = "/";
+            break;
+          default:
+            break;
+        }
+      })
+    }
+  </script>
+</body>
+
+</html>

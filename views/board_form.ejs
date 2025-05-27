@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form action="/board_insert_ok" method="post" onsubmit="return validation()">
+    <textarea placeholder="제목 2글자이상 20글자 이하" cols="50" name="title"></textarea><br>
+    <textarea placeholder="내용 2글자이상 100글자 이하" rows="30" cols="50" name="contents"></textarea><br>
+    <input type="submit" value="작성">
+  </form>
+  <script>
+    function validation() {
+      const title = document.getElementsByName("title")[0].value;
+      const contents = document.getElementsByName("contents")[0].value;
+      
+      if (title.length <= 1 || title.length >= 21) {
+        alert("제목은 2글자이상 20글자이하");
+        return false;
+      }
+      if (contents.length <= 1 || contents.length >= 101) {
+        alert("내용은 2글자이상 100글자이하");
+        return false;
+      }
+      return true;
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Document</title>
+</head>
+
+<body>
+  <form action="/shop/shop_insert_ok" method="post" enctype="multipart/form-data" name="shop_form">
+    <textarea placeholder="이름 2글자이상 20글자 이하" cols="50" name="name"></textarea><br>
+    <textarea placeholder="음식소개 2글자이상 70글자 이하" rows="10" cols="50" name="description"></textarea><br>
+    <input type="number" name="price" placeholder="가격(500원 이상)"><br>
+    <input type="file" name="img"><br>
+    <input type="button" value="작성" onclick="validation();">
+  </form>
+  <script>
+    async function validation() {
+      const name = document.getElementsByName("name")[0].value;
+      const description = document.getElementsByName("description")[0].value;
+      const price = document.getElementsByName("price")[0].value;
+      const img = document.getElementsByName("img")[0].value;
+      const img2 = document.getElementsByName("img")[0];
+      const shop_form = document.getElementsByName("shop_form")[0];
+
+
+      if (name.length <= 1 || name.length >= 21) {
+        alert("이름은 2글자이상 20글자이하");
+        return false;
+      }
+      if (description.length <= 1 || description.length >= 71) {
+        alert("음식소개는 2글자이상 70글자이하");
+        return false;
+      }
+      
+      if (price < 500 || price > 10000000) {
+        alert("가격은 500원 이상 천만원 이하");
+        return false;
+      }
+
+      if (!img) {
+        alert("파일 선택을 클릭해 이미지를 등록해주세요");
+        return false;
+      }
+      const ext = img.split('.').pop().toLowerCase();
+      const ext_array = ["jpg", "jpeg", "png"];
+      let ext_check = false;
+      for (let i = 0; i < ext_array.length; i++) {
+        if (ext == ext_array[i]) {
+          ext_check = true;
+        }
+      }
+      if (ext_check == false) {
+        alert("jpg,jpeg,png만 등록할수 있습니다.");
+        return false;
+      }
+      async function img_check_func() {
+        return new Promise((resolve, reject) => {
+          const _URL = window.URL || window.webkitURL;
+          const image = new Image();
+
+          image.src = _URL.createObjectURL(img2.files[0]);
+
+          image.onerror = () => {
+            resolve(false);
+          }
+          image.onload = () => {
+            resolve(true);
+          }
+        });
+      }
+      const img_check = await img_check_func();
+      if (img_check == false) {
+        alert("이미지 파일이 아님");
+      } else {
+        shop_form.submit();
+      }
+
+
+      //shop_form.submit();
+
+
+
+
+      /*
+      const ext = img.split('.').pop().toLowerCase();
+      if (ext == "jpg" || ext == "jpeg" || ext == "png") {
+        return true;
+      } else {
+        alert("jpg,jpeg,png만 등록할수 있습니다.");
+        return false;
+      }*/
+
+
+
+      return false;
+    }
+  </script>
+</body>
+
+</html>

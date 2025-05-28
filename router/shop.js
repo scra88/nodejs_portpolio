@@ -151,11 +151,16 @@ router.post('/shop_insert_ok', upload.single('img'), [
 })
 router.get('/shoplist', (req, res) => {
     shop.findAllDisabled(req, res, async (err, rows) => {
-        for (let i = 0; i < rows.length; i++) {
-            const user_id_info = await user_id_info_func(req, res, rows[i].user_id);
-            rows[i].user_id = user_id_info.name;
+        if (rows.length >= 1) {
+            for (let i = 0; i < rows.length; i++) {
+                const user_id_info = await user_id_info_func(req, res, rows[i].user_id);
+                rows[i].user_id = user_id_info.name;
+            }
+            res.render("shoplist", { rows: rows });
+        } else {
+            res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+            res.write("<script>alert('등록된 상품이 없습니다.');location.href='/';</script>");
         }
-        res.render("shoplist", { rows: rows });
         //const user_id_info = await user_id_info_func(req, res, rows.id);
     });
 

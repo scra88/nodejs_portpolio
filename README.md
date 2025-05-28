@@ -12,6 +12,8 @@ npm start // 명령어 실행
 
 서버 온이라는 텍스트가 보이면서 실행에 성공하면 http://localhost:3000/ 주소로 접속
 
+![Image](https://github.com/user-attachments/assets/64d1fa16-916e-4a38-84c0-c5b0f6c96ecd)
+
 2.SQL
 
 MySQL Workbench 설치 

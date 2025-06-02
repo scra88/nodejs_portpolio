@@ -20,6 +20,8 @@ MySQL Workbench 설치
 
 Schema 이름은 jh
 
+쿼리 아이디 : root 쿼리 비밀번호 : root
+
 폴더안에 Dump20250528.sql 불러와서 적용하기
 
 
